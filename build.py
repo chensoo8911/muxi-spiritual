@@ -62,7 +62,7 @@ def build_home():
     body = f"""<section class="hero wrap">
   <div class="eyebrow">A Spiritual Archive</div>
   <h1>木喜身心靈</h1>
-  <p>吳木喜，原為大學電腦繪圖老師，後辭去教職、移居鄉下種田養雞，專注靈性修習。<br>這裡彙整他多年來推薦、朗讀與口傳的身心靈資源與教導。</p>
+  <p>這裡彙整木喜多年來推薦、朗讀與口傳的身心靈資源與教導。</p>
   <span class="seal">聆聽內在那微細的低語 ── 天音</span>
 </section>
 
@@ -93,7 +93,9 @@ BOOKS = [
   {"slug":"海奧華預言", "spine":"", "author":"米歇・戴斯瑪克特",
    "tags":[("full","全文可讀"),("audio","有聲書")],
    "blurb":"第九級星球的九日旅程。談人類起源、靈魂演化、地球文明的真相與未來。",
-   "reader":True},
+   "reader":True, "src":"01_海奧華預言", "subtitle":"第九級星球的九日旅程，奇幻不思議的真實見聞。",
+   "audio_embeds":[("fUr4Nv7tryk","有聲書 · 上","YouTube 有聲書朗讀（上集）"),
+                   ("C87YV0iCVK4","有聲書 · 下","YouTube 有聲書朗讀（下集）")]},
   {"slug":"阿納絲塔夏", "spine":"green", "author":"弗拉狄米爾・米格烈",
    "tags":[("audio","有聲書"),("link","導讀")],
    "blurb":"鳴響雪松系列第一冊。西伯利亞森林的隱居女子，談人與自然合一、回歸土地。",
@@ -101,8 +103,9 @@ BOOKS = [
    "why":"階梯書單的起點。「回歸自然、相信直覺」的精神，與木喜搬到鄉下務農的實踐高度呼應。",
    "links":[("鳴響雪松中文官網","https://www.cedarray.com/"),("讀墨電子書","https://readmoo.com/book/210086601000101")]},
   {"slug":"耶穌-我的自傳", "name":"耶穌：我的自傳", "spine":"gold", "author":"蒂娜・司帕爾汀 傳訊",
-   "tags":[("audio","木喜朗讀"),("link","導讀")],
+   "tags":[("full","全文可讀"),("audio","木喜朗讀")],
    "blurb":"以第一人稱講述一個平易近人、非教會版本的耶穌。木喜親自朗讀成有聲書。",
+   "reader":True, "src":"04_耶穌-我的自傳", "subtitle":"以第一人稱講述一個平易近人、非教會版本的耶穌。",
    "audio_playlist":"PLzGMJVlc_bxUqbgiCLHBegQ1Ei69KzYFj",
    "audio_id":"L-YjOqq1zgY",
    "episodes":[("001 譯者序","L-YjOqq1zgY"),("002 作者序","TxBgNSgELnU"),("003 導言","OOjRSN-p2xQ"),
@@ -112,8 +115,9 @@ BOOKS = [
    "why":"木喜「上主即合一、耶穌是覺醒者、天國在心裡」的觀點主要源自本書。",
    "links":[("繁中 Kindle 版","https://www.amazon.com/dp/B081HXB75Y")]},
   {"slug":"告別娑婆", "spine":"", "author":"蓋瑞・雷納",
-   "tags":[("link","導讀")],
+   "tags":[("full","全文可讀"),("link","導讀")],
    "blurb":"進入《奇蹟課程》前最受歡迎的導讀書。十七場與揚升大師的對話，談寬恕與幻相。",
+   "reader":True, "src":"02_告別娑婆", "subtitle":"十七場與揚升大師的對話，談寬恕、幻相與真寬恕。",
    "why":"階梯書單中「奇蹟課程」的前一站，木喜的寬恕教導大量取自本書。",
    "links":[("英文全文 Internet Archive","https://archive.org/details/disappearanceof00gary")]},
   {"slug":"奇蹟課程", "spine":"gold", "author":"海倫・舒曼 筆錄",
@@ -151,40 +155,51 @@ def build_book_list():
 </div>"""
     page("書籍/index.html", "靈性書籍 ／ 有聲書 · 木喜身心靈", 1, body)
 
-# ---------- 海奧華 閱讀器 ----------
-def read_chapters():
-    files = sorted(glob.glob(os.path.join(BOOK_SRC, "[0-9]*.md")))
+# ---------- 通用全文閱讀器（任何 reader 書都能用）----------
+ELECTRONIC = os.path.join(ROOT, "..", "電子書")
+
+def read_chapters(src_folder):
+    files = sorted(glob.glob(os.path.join(ELECTRONIC, src_folder, "[0-9]*.md")))
     chs = []
     for f in files:
         with open(f, encoding="utf-8") as fh:
             txt = fh.read()
-        lines = txt.split("\n")
-        title = lines[0].lstrip("# ").strip()
+        title = txt.split("\n",1)[0].lstrip("# ").strip()
         paras = [p.strip() for p in txt.split("\n\n")[1:] if p.strip()]
         slug = os.path.splitext(os.path.basename(f))[0]
         chs.append({"slug":slug, "title":title, "paras":paras})
     return chs
 
-def build_haiaohua():
-    chs = read_chapters()
+def build_reader(b):
+    """產生某書的目錄頁＋各章閱讀頁。若無章節檔，回傳 False（改走導讀頁）。"""
+    chs = read_chapters(b["src"])
+    if not chs:
+        return False
+    name = book_name(b); slug = b["slug"]
+
+    # 有聲書嵌入（海奧華=上下集、耶穌=木喜朗讀九集）
+    aud = ""
+    if b.get("audio_embeds"):
+        cards = "".join(lite_yt(i,t,d) for i,t,d in b["audio_embeds"])
+        aud = f'<div class="vid-grid" style="grid-template-columns:1fr 1fr; margin-bottom:1.5rem">{cards}</div>'
+    elif b.get("episodes"):
+        cards = "".join(lite_yt(vid,t,"木喜朗讀") for t,vid in b["episodes"])
+        aud = f'<h2 style="font-size:1.3rem;margin:1.5rem 0 1rem">木喜朗讀有聲書</h2><div class="vid-grid">{cards}</div>'
+
     # 目錄頁
     toc = []
     for i, c in enumerate(chs):
         no = "序" if i==0 else str(i)
         toc.append(f'<li><a href="{c["slug"]}.html"><span class="n">{no}</span><span>{html.escape(c["title"])}</span></a></li>')
     body = f"""<div class="read">
-<div class="section-head"><div class="eyebrow">米歇・戴斯瑪克特</div>
-<h1>海奧華預言</h1>
-<p>第九級星球的九日旅程，奇幻不思議的真實見聞。</p><hr class="divider"></div>
-
-<div class="vid-grid" style="grid-template-columns:1fr 1fr; margin-bottom:1.5rem">
-  {lite_yt("fUr4Nv7tryk","有聲書 · 上","YouTube 有聲書朗讀（上集）")}
-  {lite_yt("C87YV0iCVK4","有聲書 · 下","YouTube 有聲書朗讀（下集）")}
-</div>
+<div class="section-head"><div class="eyebrow">{html.escape(b['author'])}</div>
+<h1>{html.escape(name)}</h1>
+<p>{html.escape(b.get('subtitle', b['blurb']))}</p><hr class="divider"></div>
+{aud}
 <p style="text-align:center;color:var(--ink-faint)">點開任一章，頁面置頂可「一鍵朗讀」全章。</p>
 <ul class="toc">{''.join(toc)}</ul>
 </div>"""
-    page("書籍/海奧華預言/index.html", "海奧華預言 · 木喜身心靈", 2, body)
+    page(f"書籍/{slug}/index.html", f"{name} · 木喜身心靈", 2, body)
 
     # 各章閱讀頁
     for i, c in enumerate(chs):
@@ -194,7 +209,7 @@ def build_haiaohua():
         no_label = "序" if i==0 else f"第 {i} 章"
         body = f"""<div class="reader-top">
   <div class="read">
-    <span class="book-label">海奧華預言</span>
+    <span class="book-label">{html.escape(name)}</span>
     <div class="player">
       <button class="btn-audio" id="btn-read"><span class="ico"></span><span class="txt">▶ 朗讀本章</span></button>
       <button class="btn-ghost" id="btn-stop" style="display:none">停止</button>
@@ -211,7 +226,8 @@ def build_haiaohua():
 </article>
 <nav class="pager">{prev_a}{nxt_a}</nav>
 </div>"""
-        page(f"書籍/海奧華預言/{c['slug']}.html", f"{c['title']} · 海奧華預言", 2, body)
+        page(f"書籍/{slug}/{c['slug']}.html", f"{c['title']} · {name}", 2, body)
+    return True
 
 # ---------- 其他書 導讀頁 ----------
 def build_book_intro(b):
@@ -340,10 +356,11 @@ def build_muxi():
 if __name__ == "__main__":
     build_home()
     build_book_list()
-    build_haiaohua()
     for b in BOOKS:
-        if not b.get("reader"):
-            build_book_intro(b)
+        # 標記可讀全文者嘗試產生閱讀器；無章節檔則退回導讀頁
+        if b.get("reader") and build_reader(b):
+            continue
+        build_book_intro(b)
     build_videos()
     build_muxi()
     print("\n✅ 網站產生完成 →", ROOT)
