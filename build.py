@@ -338,7 +338,7 @@ def build_muxi():
     body = f"""<div class="read">
 <div class="section-head"><div class="eyebrow">Section III</div>
 <h1>木喜專區</h1>
-<p>吳木喜身心靈教導的精華統整 ── 十一項核心理念，與十句常引用的金句。</p>
+<p>吳木喜身心靈教導精華：十一項核心理念與十句金句。</p>
 <hr class="divider"></div>
 
 <div class="intro-block">
