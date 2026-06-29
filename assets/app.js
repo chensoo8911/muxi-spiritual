@@ -12,7 +12,9 @@ document.addEventListener('click', function(e){
   if(!id || yt.dataset.loaded) return;
   yt.dataset.loaded = '1';
   const ifr = document.createElement('iframe');
-  ifr.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
+  // 標準網域 + 帶上來源（避免錯誤 153）；file:// 開啟時 origin 為 null，YouTube 仍會擋
+  const origin = (location.protocol === 'http:' || location.protocol === 'https:') ? '&origin=' + encodeURIComponent(location.origin) : '';
+  ifr.src = 'https://www.youtube.com/embed/' + id + '?autoplay=1&rel=0&playsinline=1' + origin;
   ifr.title = 'YouTube';
   ifr.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
   ifr.allowFullscreen = true;
