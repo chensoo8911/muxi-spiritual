@@ -27,7 +27,7 @@ def nav(depth):
     return f"""<header class="nav">
   <a class="brand" href="{a}index.html">木喜<small>身心靈</small></a>
   <nav class="links">
-    <a href="{a}書籍/index.html">靈性書籍</a>
+    <a href="{a}書籍/index.html">推薦書單</a>
     <a href="{a}影片/index.html">靈性影片</a>
     <a href="{a}木喜專區/index.html">木喜專區</a>
   </nav>
@@ -69,7 +69,7 @@ def build_home():
 <section class="wrap">
   <div class="zones">
     <a class="zone" href="書籍/index.html">
-      <div><div class="num">I.</div><h2>靈性書籍 ／ 有聲書</h2>
+      <div><div class="num">I.</div><h2>推薦書單</h2>
       <p>海奧華預言、阿納絲塔夏、耶穌自傳⋯⋯ 可閱讀全文，並一鍵朗讀。</p></div>
       <div class="go">進入書房</div>
     </a>
@@ -148,12 +148,12 @@ def build_book_list():
 </a>""")
     body = f"""<div class="wrap">
 <div class="section-head"><div class="eyebrow">Section I</div>
-<h1>靈性書籍 ／ 有聲書</h1>
+<h1>推薦書單</h1>
 <p>木喜推薦與朗讀的身心靈書籍。可閱讀全文者附「一鍵朗讀」，並收錄相關有聲書。</p>
 <hr class="divider"></div>
 <div class="books">{''.join(cards)}</div>
 </div>"""
-    page("書籍/index.html", "靈性書籍 ／ 有聲書 · 木喜身心靈", 1, body)
+    page("書籍/index.html", "推薦書單 · 木喜身心靈", 1, body)
 
 # ---------- 通用全文閱讀器（任何 reader 書都能用）----------
 ELECTRONIC = os.path.join(ROOT, "..", "電子書")
