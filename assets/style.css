@@ -1,0 +1,281 @@
+/* ============================================================
+   木喜身心靈 · 設計系統
+   風格：editorial / 自然沉靜（暖紙＋墨黑＋陶土）
+   字體：Noto Serif TC（小說襯線）／ 大字級長輩好讀
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700;900&family=EB+Garamond:ital@0;1&display=swap');
+
+:root{
+  --paper:    #F6F1E6;
+  --paper-2:  #EFE7D6;
+  --paper-3:  #E7DcC6;
+  --ink:      #211C15;
+  --ink-soft: #574E40;
+  --ink-faint:#8B8170;
+  --clay:     #A6562C;   /* 主強調：陶土 */
+  --clay-deep:#8A431F;
+  --sage:     #6B7553;   /* 次強調：草木 */
+  --gold:     #B0883B;
+  --line:     #D8CDB6;
+
+  --serif: "Noto Serif TC", "Songti TC", serif;
+  --latin: "EB Garamond", "Noto Serif TC", serif;
+
+  --read:   17px;        /* 基準閱讀字級（行動再放大） */
+  --maxw:   720px;
+}
+
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0;
+  font-family:var(--serif);
+  color:var(--ink);
+  background:var(--paper);
+  font-size:var(--read);
+  line-height:1.95;
+  font-weight:400;
+  /* 紙紋：極淡顆粒 */
+  background-image:
+    radial-gradient(circle at 50% 0, rgba(166,86,44,.04), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.025'/%3E%3C/svg%3E");
+}
+img{ max-width:100%; display:block; }
+a{ color:var(--clay); text-decoration:none; }
+a:hover{ color:var(--clay-deep); }
+
+/* ---------- 頁首 ---------- */
+.nav{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.85rem clamp(1rem,4vw,2.5rem);
+  background:rgba(246,241,230,.86);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav .brand{
+  font-weight:900; font-size:1.25rem; letter-spacing:.04em;
+  color:var(--ink);
+}
+.nav .brand small{ font-weight:400; color:var(--ink-faint); font-size:.7rem; letter-spacing:.2em; display:block; margin-top:-2px; }
+.nav .links{ display:flex; gap:clamp(.8rem,3vw,1.8rem); }
+.nav .links a{ color:var(--ink-soft); font-size:1rem; font-weight:500; }
+.nav .links a:hover, .nav .links a.active{ color:var(--clay); }
+
+/* ---------- 容器 ---------- */
+.wrap{ max-width:1080px; margin:0 auto; padding:0 clamp(1.1rem,4vw,2rem); }
+.read{ max-width:var(--maxw); margin:0 auto; padding:0 clamp(1.1rem,5vw,1.5rem); }
+
+/* ---------- 首頁 Hero ---------- */
+.hero{
+  text-align:center;
+  padding:clamp(3.5rem,12vw,7rem) 1rem clamp(2rem,7vw,4rem);
+  position:relative;
+}
+.hero .eyebrow{
+  font-family:var(--latin); font-style:italic;
+  color:var(--clay); letter-spacing:.18em; font-size:1.1rem;
+  margin-bottom:1.2rem;
+}
+.hero h1{
+  font-weight:900; line-height:1.15;
+  font-size:clamp(2.6rem,9vw,5rem);
+  margin:.2em 0 .35em; letter-spacing:.02em;
+}
+.hero p{
+  color:var(--ink-soft); font-size:clamp(1.05rem,3.4vw,1.3rem);
+  max-width:34em; margin:0 auto; line-height:2;
+}
+.hero .seal{
+  display:inline-block; margin-top:2rem; padding:.4em 1.4em;
+  border:1px solid var(--line); border-radius:999px;
+  font-size:.95rem; color:var(--ink-faint); letter-spacing:.1em;
+}
+
+/* ---------- 三區卡片 ---------- */
+.zones{
+  display:grid; gap:clamp(1rem,3vw,1.6rem);
+  grid-template-columns:repeat(3,1fr);
+  padding:clamp(1.5rem,5vw,3rem) 0 clamp(4rem,9vw,6rem);
+}
+.zone{
+  display:flex; flex-direction:column; justify-content:space-between;
+  min-height:230px; padding:1.8rem 1.6rem;
+  background:var(--paper-2); border:1px solid var(--line); border-radius:6px;
+  transition:transform .25s ease, box-shadow .25s ease, background .25s ease;
+  position:relative; overflow:hidden;
+}
+.zone:hover{ transform:translateY(-4px); box-shadow:0 18px 40px -22px rgba(33,28,21,.5); background:var(--paper-3); }
+.zone .num{ font-family:var(--latin); font-style:italic; color:var(--clay); font-size:1.4rem; }
+.zone h2{ font-size:1.7rem; font-weight:700; margin:.5rem 0 .4rem; }
+.zone p{ color:var(--ink-soft); font-size:1rem; line-height:1.85; margin:0; }
+.zone .go{ margin-top:1.3rem; color:var(--clay); font-weight:600; }
+.zone .go::after{ content:" →"; }
+
+/* ---------- 區段標題 ---------- */
+.section-head{ text-align:center; padding:clamp(2.5rem,8vw,4.5rem) 0 1.5rem; }
+.section-head .eyebrow{ font-family:var(--latin); font-style:italic; color:var(--clay); letter-spacing:.16em; }
+.section-head h1{ font-size:clamp(2rem,6vw,3rem); font-weight:900; margin:.3rem 0; }
+.section-head p{ color:var(--ink-soft); max-width:32em; margin:.6rem auto 0; }
+.divider{ width:46px; height:3px; background:var(--clay); border:0; margin:1.4rem auto 0; }
+
+/* ---------- 書籍卡片列表 ---------- */
+.books{ display:grid; gap:1.3rem; grid-template-columns:repeat(2,1fr); padding-bottom:4rem; }
+.book{
+  display:flex; gap:1.2rem; padding:1.5rem;
+  background:var(--paper-2); border:1px solid var(--line); border-radius:6px;
+  transition:transform .2s, box-shadow .2s;
+}
+.book:hover{ transform:translateY(-3px); box-shadow:0 16px 36px -24px rgba(33,28,21,.5); }
+.book .spine{ width:6px; border-radius:3px; background:var(--clay); flex:none; }
+.book.green .spine{ background:var(--sage); }
+.book.gold  .spine{ background:var(--gold); }
+.book h3{ font-size:1.4rem; margin:0 0 .2rem; font-weight:700; }
+.book .meta{ color:var(--ink-faint); font-size:.92rem; margin-bottom:.5rem; }
+.book p{ color:var(--ink-soft); font-size:1rem; line-height:1.8; margin:0 0 .7rem; }
+.tag{ display:inline-block; font-size:.8rem; padding:.15em .8em; border-radius:999px; letter-spacing:.04em; }
+.tag.full{ background:var(--sage); color:#fff; }
+.tag.audio{ background:var(--clay); color:#fff; }
+.tag.link{ background:transparent; color:var(--ink-faint); border:1px solid var(--line); }
+
+/* ---------- 閱讀頁 ---------- */
+.reader-top{
+  position:sticky; top:54px; z-index:30;
+  background:var(--paper); border-bottom:1px solid var(--line);
+  padding:.7rem 0;
+}
+.reader-top .read{ display:flex; align-items:center; gap:.9rem; flex-wrap:wrap; }
+.book-label{ color:var(--ink-faint); font-size:.9rem; letter-spacing:.06em; }
+.player{
+  display:inline-flex; align-items:center; gap:.6rem;
+  margin-left:auto;
+}
+.btn-audio{
+  display:inline-flex; align-items:center; gap:.5em;
+  padding:.55em 1.2em; border-radius:999px; cursor:pointer;
+  background:var(--clay); color:#fff; border:0;
+  font-family:var(--serif); font-size:1rem; font-weight:600;
+  transition:background .2s, transform .1s;
+}
+.btn-audio:hover{ background:var(--clay-deep); }
+.btn-audio:active{ transform:scale(.97); }
+.btn-audio .ico{ font-size:1.05em; line-height:1; }
+.btn-ghost{
+  padding:.5em 1em; border-radius:999px; cursor:pointer;
+  background:transparent; color:var(--ink-soft); border:1px solid var(--line);
+  font-family:var(--serif); font-size:.95rem;
+}
+.btn-ghost:hover{ border-color:var(--clay); color:var(--clay); }
+.audio-hint{ font-size:.82rem; color:var(--ink-faint); flex-basis:100%; margin-top:.1rem; }
+
+article.reading{ padding:clamp(2rem,6vw,3.5rem) 0 1rem; }
+article.reading h1{
+  font-size:clamp(1.9rem,6vw,2.8rem); font-weight:900; line-height:1.3;
+  margin:0 0 1.6rem; text-align:center;
+}
+article.reading .chap-no{
+  display:block; font-family:var(--latin); font-style:italic;
+  color:var(--clay); font-size:1.3rem; text-align:center; margin-bottom:.3rem;
+}
+article.reading p{
+  margin:0 0 1.5em; font-size:1.18rem; line-height:2.15;
+  text-align:justify; text-indent:2em;
+}
+article.reading p.speaking{ background:rgba(176,136,59,.16); border-radius:3px; }
+
+/* 章節翻頁 */
+.pager{
+  display:flex; align-items:stretch; gap:1rem;
+  margin:3rem 0 5rem; padding-top:2rem; border-top:1px solid var(--line);
+}
+.pager a, .pager span{
+  flex:1; padding:1.1rem 1.3rem; border:1px solid var(--line); border-radius:6px;
+  background:var(--paper-2); color:var(--ink-soft);
+  display:flex; flex-direction:column; gap:.2rem;
+  transition:background .2s, transform .2s;
+}
+.pager a:hover{ background:var(--paper-3); transform:translateY(-2px); color:var(--ink); }
+.pager .dir{ font-size:.8rem; color:var(--ink-faint); letter-spacing:.1em; }
+.pager .ttl{ font-size:1.1rem; font-weight:600; }
+.pager .next{ text-align:right; }
+.pager .disabled{ opacity:.4; }
+
+/* 目錄頁 */
+.toc{ list-style:none; padding:0; margin:0 0 4rem; }
+.toc li{ border-bottom:1px solid var(--line); }
+.toc a{
+  display:flex; align-items:baseline; gap:1rem; padding:1.1rem .4rem;
+  color:var(--ink); font-size:1.2rem; transition:padding .2s, color .2s;
+}
+.toc a:hover{ padding-left:1.2rem; color:var(--clay); }
+.toc .n{ font-family:var(--latin); font-style:italic; color:var(--clay); width:2.2em; flex:none; }
+
+/* ---------- 影片區 ---------- */
+.vid-cat{ padding:clamp(1.5rem,5vw,2.5rem) 0 .5rem; }
+.vid-cat h2{
+  font-size:1.6rem; font-weight:700; margin:0 0 .3rem;
+  display:flex; align-items:center; gap:.7rem;
+}
+.vid-cat h2 .dot{ width:.7em; height:.7em; border-radius:50%; background:var(--clay); flex:none; }
+.vid-cat .cdesc{ color:var(--ink-faint); margin:0 0 1.3rem; }
+.vid-grid{ display:grid; gap:1.4rem; grid-template-columns:repeat(3,1fr); }
+.vcard{ background:var(--paper-2); border:1px solid var(--line); border-radius:8px; overflow:hidden; display:flex; flex-direction:column; }
+.yt{ position:relative; aspect-ratio:16/9; background:#000; cursor:pointer; overflow:hidden; }
+.yt img{ width:100%; height:100%; object-fit:cover; transition:transform .4s, opacity .3s; }
+.yt:hover img{ transform:scale(1.05); opacity:.85; }
+.yt .play{
+  position:absolute; inset:0; margin:auto; width:64px; height:64px;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(166,86,44,.92); border:0; border-radius:50%; cursor:pointer;
+  color:#fff; font-size:1.5rem; padding-left:5px;
+  transition:transform .2s, background .2s;
+}
+.yt:hover .play{ transform:scale(1.12); background:var(--clay); }
+.vcard .vmeta{ padding:1rem 1.1rem 1.3rem; }
+.vcard h3{ font-size:1.12rem; line-height:1.5; margin:0 0 .4rem; font-weight:600; }
+.vcard p{ font-size:.95rem; color:var(--ink-soft); line-height:1.7; margin:0; }
+
+/* ---------- 木喜專區 ---------- */
+.intro-block{ padding:clamp(1.5rem,5vw,3rem) 0; color:var(--ink-soft); font-size:1.15rem; line-height:2.1; }
+.teaching{ margin:0 0 2.6rem; }
+.teaching .t-no{ font-family:var(--latin); font-style:italic; color:var(--clay); font-size:1.5rem; }
+.teaching h3{ font-size:1.55rem; font-weight:700; margin:.1rem 0 .7rem; }
+.teaching p{ font-size:1.15rem; line-height:2.05; color:var(--ink); margin:0; }
+.teaching + .teaching{ border-top:1px solid var(--line); padding-top:2.4rem; }
+
+.quotes{ padding:clamp(2rem,6vw,3.5rem) 0 5rem; }
+.quote{
+  position:relative; margin:0 0 1.4rem; padding:1.8rem 2rem 1.8rem 3.2rem;
+  background:var(--paper-2); border-left:4px solid var(--clay); border-radius:0 6px 6px 0;
+  font-size:1.3rem; line-height:1.9; color:var(--ink);
+}
+.quote::before{
+  content:"\201C"; position:absolute; left:.7rem; top:.1rem;
+  font-family:var(--latin); font-size:3.4rem; color:var(--clay); opacity:.4;
+}
+
+/* ---------- 頁尾 ---------- */
+.foot{
+  border-top:1px solid var(--line); margin-top:2rem;
+  padding:2.6rem 1rem 3.5rem; text-align:center; color:var(--ink-faint);
+}
+.foot .f-title{ font-weight:700; color:var(--ink-soft); font-size:1.1rem; }
+.foot p{ margin:.5rem auto; max-width:30em; font-size:.92rem; line-height:1.8; }
+
+/* ---------- RWD：行動裝置放大字級、單欄 ---------- */
+@media (max-width:900px){
+  .zones{ grid-template-columns:1fr; }
+  .books{ grid-template-columns:1fr; }
+  .vid-grid{ grid-template-columns:repeat(2,1fr); }
+}
+@media (max-width:620px){
+  :root{ --read:19px; }                 /* 長輩好讀：行動基準放大 */
+  body{ line-height:2; }
+  .nav .links{ font-size:.95rem; }
+  .vid-grid{ grid-template-columns:1fr; }
+  article.reading p{ font-size:1.28rem; line-height:2.25; text-indent:2em; }
+  .reader-top{ top:50px; }
+  .pager{ flex-direction:column; }
+  .quote{ font-size:1.25rem; padding-left:2.8rem; }
+}
