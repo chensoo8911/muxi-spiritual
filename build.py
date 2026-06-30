@@ -171,6 +171,17 @@ def read_chapters(src_folder):
         chs.append({"slug":slug, "title":title, "paras":paras})
     return chs
 
+_LEAD = set('”’」』。！？，、；）)》')
+def merge_paras(paras):
+    """把以收引號或句末標點開頭的段落併回前一段（修對話被 OCR 拆行的不自然段行）。"""
+    out = []
+    for p in paras:
+        if out and p and p[0] in _LEAD:
+            out[-1] = out[-1] + p
+        else:
+            out.append(p)
+    return out
+
 def build_reader(b):
     """產生某書的目錄頁＋各章閱讀頁。若無章節檔，回傳 False（改走導讀頁）。"""
     chs = read_chapters(b["src"])
@@ -182,7 +193,7 @@ def build_reader(b):
     aud = ""
     if b.get("audio_embeds"):
         cards = "".join(lite_yt(i,t,d) for i,t,d in b["audio_embeds"])
-        aud = f'<div class="vid-grid" style="grid-template-columns:1fr 1fr; margin-bottom:1.5rem">{cards}</div>'
+        aud = f'<h2 style="font-size:1.3rem;margin:2.5rem 0 1rem">有聲書</h2><div class="vid-grid" style="grid-template-columns:1fr 1fr">{cards}</div>'
     elif b.get("episodes"):
         cards = "".join(lite_yt(vid,t,"木喜朗讀") for t,vid in b["episodes"])
         aud = f'<h2 style="font-size:1.3rem;margin:1.5rem 0 1rem">木喜朗讀有聲書</h2><div class="vid-grid">{cards}</div>'
@@ -196,9 +207,9 @@ def build_reader(b):
 <div class="section-head"><div class="eyebrow">{html.escape(b['author'])}</div>
 <h1>{html.escape(name)}</h1>
 <p>{html.escape(b.get('subtitle', b['blurb']))}</p><hr class="divider"></div>
-{aud}
 <p style="text-align:center;color:var(--ink-faint)">點開任一章，頁面置頂可「一鍵朗讀」全章。</p>
 <ul class="toc">{''.join(toc)}</ul>
+{aud}
 </div>"""
     page(f"書籍/{slug}/index.html", f"{name} · 木喜身心靈", 2, body)
 
@@ -206,7 +217,7 @@ def build_reader(b):
     for i, c in enumerate(chs):
         prev_a = f'<a href="{chs[i-1]["slug"]}.html" class="prev"><span class="dir">← 上一章</span><span class="ttl">{html.escape(chs[i-1]["title"])}</span></a>' if i>0 else '<span class="prev disabled"><span class="dir">← 上一章</span><span class="ttl">已是開頭</span></span>'
         nxt_a  = f'<a href="{chs[i+1]["slug"]}.html" class="next"><span class="dir">下一章 →</span><span class="ttl">{html.escape(chs[i+1]["title"])}</span></a>' if i<len(chs)-1 else '<span class="next disabled"><span class="dir">下一章 →</span><span class="ttl">已是結尾</span></span>'
-        paras = "\n".join(f"<p>{html.escape(p)}</p>" for p in c["paras"])
+        paras = "\n".join(f"<p>{html.escape(p)}</p>" for p in merge_paras(c["paras"]))
         no_label = "序" if i==0 else f"第 {i} 章"
         # 本章若有 AI 朗讀音檔，放真人聲克隆播放器
         la = b.get("local_audio", {}).get(c["slug"])
@@ -255,9 +266,9 @@ def build_book_intro(b):
 <p>{html.escape(b['blurb'])}</p>
 <p><strong>木喜為何推薦：</strong>{html.escape(b.get('why',''))}</p>
 </div>
-{aud}
 <h2 style="font-size:1.4rem;margin:2.5rem 0 1rem">取得方式</h2>
 <ul class="toc">{links}</ul>
+{aud}
 <p style="margin:2rem 0 4rem"><a href="index.html">← 回書房</a></p>
 </div>"""
     page(f"書籍/{b['slug']}.html", f"{book_name(b)} · 木喜身心靈", 1, body)
@@ -317,17 +328,17 @@ def build_videos():
 
 # ============================================================ 木喜專區
 TEACHINGS = [
- ("天音／直覺至上","「<strong>天音</strong>」是內在那微細的低語、直覺、第六感、童心，<br>來自內心的衝動（興奮感），是行動的第一順位。<span class='gap'></span>覺察 ≠ 想法、分析、恐懼、懷疑，而是從內在來臨的「<strong>靜默</strong>」和「<strong>平安</strong>」的召喚。<span class='gap'></span>大腦思維只用來「<strong>完成高我給的感覺</strong>」，純靠大腦想來想去只會困住自己。"),
- ("小我 vs. 高我／真我","小我充滿分析、比較、批判、患得患失、想掌控；<br>高我則讓「<strong>靈魂想唱歌</strong>」、照感覺走、不費力。<br>情緒是指南針：走在對的路上會平安喜樂，偏離軌道時情緒會用不舒服提醒你。"),
- ("做自己、放掉掌控","木喜鼓勵，從小事中（洗澡、吃飯、散步、出門不規劃）開始練習相信直覺、放掉控制；<br>越不掌控，越能與「<strong>源頭</strong>」連結，奇蹟才出得來。<span class='gap'></span>他批評學校教育總是「<strong>教人緊緊兮兮</strong>」「<strong>毀壞天音</strong>」。"),
- ("顯化法則","心想事成的關鍵：靜下來把希望的情景在腦中預演，留意那種完全滿足、安寧的感覺，輕柔握住、毫無擔心地讓它發生。<br>「<strong>只要你真心想做一件事，宇宙會為你顯化出配備</strong>」 內在的感覺就是顯化方針。"),
- ("一體（合一）與分裂","人的痛苦來自「<strong>分裂</strong>」感<br>覺得與他人是分離的個體、為生存互相算計；<br>真相是「<strong>我們是一個整體</strong>」，要互助互愛。<br>一體帶來歸屬感與安全感，所有靈性影片／書的共同目標都是「<strong>由分裂走向合一</strong>」。"),
+ ("天音／直覺至上","「<strong>天音</strong>」是內在那微細的低語、直覺、第六感、童心，<br>來自內心的衝動（興奮感），是行動的第一順位。<span class='gap'></span><strong>覺察</strong> ≠ 想法、分析、恐懼、懷疑，而是從內在來臨的「<strong>靜默</strong>」和「<strong>平安</strong>」的召喚。<span class='gap'></span>大腦思維只用來「<strong>完成高我給的感覺</strong>」，純靠大腦想來想去只會困住自己。"),
+ ("小我 vs. 高我／真我","<strong>小我</strong>：充滿分析、比較、批判、患得患失、想掌控；<br><strong>高我</strong>：<strong>靈魂想唱歌</strong>、照感覺走、不費力。<span class='gap'></span>情緒是指南針，走在對的路上會平安喜樂，偏離軌道時情緒會用不舒服提醒你。"),
+ ("做自己、放掉掌控","木喜鼓勵，從日常小事（如洗澡、吃飯、散步、出門不規劃）開始練習相信直覺、放掉控制；<br>越不掌控，越能與「<strong>源頭</strong>」連結，奇蹟才出得來。<span class='gap'></span>他批評教育與社會總是「<strong>教人緊緊兮兮</strong>」、「<strong>毀壞天音</strong>」。"),
+ ("顯化法則","心想事成關鍵：靜下來把希望的情景在腦中預演，留意那種完全滿足、安寧的感覺，輕柔握住、毫無擔心地讓它發生。<br>「<strong>只要你真心想做一件事，宇宙會為你顯化出配備</strong>」 內在的感覺就是顯化方針。"),
+ ("一體（合一）與分裂","人的痛苦來自「<strong>分裂感</strong>」，覺得與他人是分離的個體、為生存互相算計；<br>其實，我們是需要互助互愛的<strong>一個整體</strong>。<span class='gap'></span>一體帶來歸屬感與安全感，所有靈性的共同目標都是「<strong>由分裂走向合一</strong>」。"),
  ("階梯式書單與課程","<strong style='color:var(--ink)'>學習地圖：阿納絲塔夏 → 耶穌：我的自傳 → 告別娑婆 → 奇蹟課程</strong><br>教導「<strong>上主是你可信賴的力量，不要只靠自己</strong>」。<br><span style='font-size:.88em;color:var(--ink-faint)'>——引用自《奇蹟課程》原文（第 47,50,88,110,132,182,268 等）</span>"),
- ("寬恕","「<strong>奇蹟課程專教寬恕，用寬恕化解所有問題，連生老病死都能治。</strong>」<br>真寬恕不是為改善關係，而是化解潛意識的罪咎。<br>寬恕三要素：記得你在作夢、寬恕投射出的形象與自己、信賴聖靈。"),
- ("上主／耶穌（源自耶穌自傳，非新／舊約聖經）","「<strong>上帝</strong>」即「<strong>合一</strong>」，是一股無條件的愛的意識；<br>「<strong>耶穌</strong>」是平易近人的覺醒者，教人如何愛自己也愛別人。<span class='gap'></span>天國就在你心裡，物質世界是心靈分裂的夢境。"),
+ ("寬恕","「<strong>奇蹟課程</strong>」專教寬恕，用寬恕化解所有問題，連生老病死都能治。<br>真寬恕不是為改善關係，而是化解潛意識的罪咎。<span class='gap'></span><strong style='color:var(--ink)'>寬恕三要素：</strong>記得你在作夢、寬恕投射出的形象與自己、信賴聖靈。"),
+ ("上主／耶穌（源自耶穌自傳，非新／舊約聖經）","「<strong>上帝</strong>」即「<strong>合一</strong>」，是一股無條件的愛的意識；<br>「<strong>耶穌</strong>」是平易近人的覺醒者，教人如何愛自己也愛別人。<span class='gap'></span><span style='color:var(--clay)'><strong>天國就在你心裡，物質世界是心靈分裂的夢境。</strong></span>"),
  ("對死亡的觀點","死亡不是滅亡，而是朝向更多的擴展，物質世界反而比死亡更像死亡。 <span style='font-size:.88em;color:var(--ink-faint)'>——巴夏</span>"),
- ("意識轉化四階段","從小我意識轉向心靈意識：①小我不再讓人滿足（內在空虛）→ ②不帶評判、全然接納自己（療癒內在傷口）→ ③找到內在平靜、放開控制、努力「<strong>不做</strong>」→ ④向聖靈敞開、連結神性。"),
- ("回歸自然","個人實踐：搬到鄉下種田養雞鴨，走路超過 30 分鐘「<strong>會很像冥想</strong>」，人類世界「<strong>一點也不自然</strong>」「<strong>你沒病，是這社會運作方式讓人不舒服</strong>」「<strong>做自己喜歡的工作就會好</strong>」。"),
+ ("意識轉化四階段","從小我意識，轉向心靈意識<br>① 小我不再讓人滿足（內在空虛）<br>② 不帶評判、全然接納自己（療癒內在傷口）<br>③ 找到內在平靜、放開控制、努力「<strong>不做</strong>」<br>④ 向聖靈敞開、連結神性"),
+ ("回歸自然","木喜將生活方式回歸自然，平日在山上種田養雞鴨，偶爾隨天音暫留城市完成任務，他表示：「<strong>人類世界本不自然，找回內在平靜，自然會好。</strong>」"),
 ]
 QUOTES = [
  "你內那微細的勸勉之音，那輕柔的低語，在你開始思考它之前，真的就是上主天音的一部分……當你聽到它時，跟隨它。",
