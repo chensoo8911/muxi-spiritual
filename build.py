@@ -16,6 +16,11 @@ def head(title, depth, desc=""):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html.escape(title)}</title>
 <meta name="description" content="{html.escape(desc)}">
+<link rel="icon" href="{a}assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="{a}assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="{a}assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="{a}assets/favicon-16.png">
+<link rel="apple-touch-icon" href="{a}assets/apple-touch-icon.png">
 <link rel="stylesheet" href="{a}assets/style.css">
 </head>
 <body>
