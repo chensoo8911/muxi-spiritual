@@ -241,8 +241,10 @@ article.reading p.speaking{ background:rgba(176,136,59,.16); border-radius:3px; 
 .teaching{ margin:0 0 2.6rem; }
 .teaching .t-no{ font-family:var(--latin); font-style:italic; color:var(--clay); font-size:1.5rem; }
 .teaching h3{ font-size:1.55rem; font-weight:700; margin:.1rem 0 .7rem; }
-.teaching p{ font-size:1.15rem; line-height:2.05; color:var(--ink); margin:0; }
+.teaching p{ font-size:1.15rem; line-height:1.9; color:var(--ink); margin:0; }
 .teaching + .teaching{ border-top:1px solid var(--line); padding-top:2.4rem; }
+.teaching strong, .quote strong{ color:#A6562C; }
+.teaching .gap{ display:block; height:.6em; }
 
 .quotes{ padding:clamp(2rem,6vw,3.5rem) 0 5rem; }
 .quote{
@@ -279,3 +281,8 @@ article.reading p.speaking{ background:rgba(176,136,59,.16); border-radius:3px; 
   .pager{ flex-direction:column; }
   .quote{ font-size:1.25rem; padding-left:2.8rem; }
 }
+
+/* AI 有聲書播放器 */
+.local-audio{margin:.9rem 0 .4rem}
+.local-audio .la-label{font-size:.82rem;color:var(--clay,#a65);font-weight:700;margin-bottom:.35rem;letter-spacing:.03em}
+.local-audio audio{width:100%;max-width:520px;height:38px}

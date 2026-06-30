@@ -118,6 +118,7 @@ BOOKS = [
    "tags":[("full","全文可讀"),("link","導讀")],
    "blurb":"進入《奇蹟課程》前最受歡迎的導讀書。十七場與揚升大師的對話，談寬恕與幻相。",
    "reader":True, "src":"02_告別娑婆", "subtitle":"十七場與揚升大師的對話，談寬恕、幻相與真寬恕。",
+   "local_audio":{"00_序":"告別娑婆_00序.mp3", "01_1_阿頓與白沙的出現":"告別娑婆_01第一章.mp3"},
    "why":"階梯書單中「奇蹟課程」的前一站，木喜的寬恕教導大量取自本書。",
    "links":[("英文全文 Internet Archive","https://archive.org/details/disappearanceof00gary")]},
   {"slug":"奇蹟課程", "spine":"gold", "author":"海倫・舒曼 筆錄",
@@ -207,9 +208,18 @@ def build_reader(b):
         nxt_a  = f'<a href="{chs[i+1]["slug"]}.html" class="next"><span class="dir">下一章 →</span><span class="ttl">{html.escape(chs[i+1]["title"])}</span></a>' if i<len(chs)-1 else '<span class="next disabled"><span class="dir">下一章 →</span><span class="ttl">已是結尾</span></span>'
         paras = "\n".join(f"<p>{html.escape(p)}</p>" for p in c["paras"])
         no_label = "序" if i==0 else f"第 {i} 章"
+        # 本章若有 AI 朗讀音檔，放真人聲克隆播放器
+        la = b.get("local_audio", {}).get(c["slug"])
+        local_player = ""
+        if la:
+            local_player = f"""<div class="local-audio">
+      <div class="la-label">🎧 AI 有聲書（試聽版）</div>
+      <audio controls preload="none" src="../../audio/{slug}/{la}"></audio>
+    </div>"""
         body = f"""<div class="reader-top">
   <div class="read">
     <span class="book-label">{html.escape(name)}</span>
+    {local_player}
     <div class="player">
       <button class="btn-audio" id="btn-read"><span class="ico"></span><span class="txt">▶ 朗讀本章</span></button>
       <button class="btn-ghost" id="btn-stop" style="display:none">停止</button>
@@ -307,21 +317,21 @@ def build_videos():
 
 # ============================================================ 木喜專區
 TEACHINGS = [
- ("天音／直覺至上","「天音」是內在那微細的低語、直覺、第六感、童心、來自內心的衝動（興奮），是行動的第一順位。要覺察的不是想法、分析、恐懼、懷疑，而是「從內在來臨的靜默和平安的召喚」，聽到就跟隨。大腦思維只用來「完成高我給的感覺」，靠大腦想來想去只會困住自己。"),
- ("小我 vs. 高我／真我","小我充滿分析、比較、批判、患得患失、想掌控；高我則讓「靈魂想唱歌」、照感覺走、不費力。情緒是指南針：走在對的路上會平安喜樂，偏離軌道時情緒會用不舒服提醒你。"),
- ("做自己、放掉掌控","招牌語「老師就不幹了」「做自己最美麗」。鼓勵從小事（穿衣、吃飯、買東西、出門不規劃）開始練習相信直覺、放掉控制；越不掌控，越能與「源頭」連結，奇蹟才出得來。他批評學校教育「教人緊緊兮兮」「毀壞天音」。"),
- ("顯化法則","心想事成的關鍵：靜下來把希望的情景在腦中預演，留意那種完全滿足、安寧的感覺，輕柔握住、毫無擔心地讓它發生。「只要你真心想做一件事，宇宙會為你顯化出配備。」內在的感覺就是顯化方針。"),
- ("一體（合一）與分裂","人的痛苦來自「分裂」感——覺得與他人是分離的個體、為生存互相算計；真相是「我們是一個整體」，要互助互愛。一體帶來歸屬感與安全感，所有靈性影片／書的共同目標都是「由分裂走向合一」。"),
- ("階梯式書單與課程","為學生規劃循序的靈修地圖：阿納絲塔夏 → 耶穌：我的自傳 → 告別娑婆 → 奇蹟課程，並大量引用《奇蹟課程》練習手冊原文（第 47、50、88、110、132、182、268 課等），強調「上主是你可信賴的力量，不要只靠自己」。"),
- ("寬恕","「奇蹟課程專教寬恕，用寬恕化解所有問題，連生老病死都能治。」真寬恕不是為改善關係，而是化解潛意識的罪咎。寬恕三要素：記得你在作夢、寬恕投射出的形象與自己、信賴聖靈。"),
- ("上主／耶穌（非教會版）","他口中的「上帝」即「合一」，是一股無條件的愛的意識；「耶穌」是平易近人的覺醒者，教人如何愛自己也愛別人。強調「天國就在你心裡」、物質世界是心靈分裂的夢境。"),
- ("對死亡的觀點","引用巴夏：死亡不是滅亡，而是「朝向更多的擴展」，物質世界反而「比死亡更像死亡」。「你的寵物永遠都在，牠現在用另一種頻率活著。」"),
- ("意識轉化四階段","從小我意識轉向心靈意識：①小我不再讓人滿足（內在空虛）→ ②不帶評判、全然接納自己（療癒內在傷口）→ ③找到內在平靜、放開控制、努力「不做」→ ④向聖靈敞開、連結神性。"),
- ("回歸自然","個人實踐：搬到鄉下種田養雞鴨，走路超過 30 分鐘「會很像冥想」，人類世界「一點也不自然」「你沒病，是這社會運作方式讓人不舒服」「做自己喜歡的工作就會好」。"),
+ ("天音／直覺至上","「<strong>天音</strong>」是內在那微細的低語、直覺、第六感、童心，<br>來自內心的衝動（興奮感），是行動的第一順位。<span class='gap'></span>覺察 ≠ 想法、分析、恐懼、懷疑，而是從內在來臨的「<strong>靜默</strong>」和「<strong>平安</strong>」的召喚。<span class='gap'></span>大腦思維只用來「<strong>完成高我給的感覺</strong>」，純靠大腦想來想去只會困住自己。"),
+ ("小我 vs. 高我／真我","小我充滿分析、比較、批判、患得患失、想掌控；<br>高我則讓「<strong>靈魂想唱歌</strong>」、照感覺走、不費力。<br>情緒是指南針：走在對的路上會平安喜樂，偏離軌道時情緒會用不舒服提醒你。"),
+ ("做自己、放掉掌控","木喜鼓勵，從小事中（洗澡、吃飯、散步、出門不規劃）開始練習相信直覺、放掉控制；<br>越不掌控，越能與「<strong>源頭</strong>」連結，奇蹟才出得來。<span class='gap'></span>他批評學校教育總是「<strong>教人緊緊兮兮</strong>」「<strong>毀壞天音</strong>」。"),
+ ("顯化法則","心想事成的關鍵：靜下來把希望的情景在腦中預演，留意那種完全滿足、安寧的感覺，輕柔握住、毫無擔心地讓它發生。<br>「<strong>只要你真心想做一件事，宇宙會為你顯化出配備</strong>」 內在的感覺就是顯化方針。"),
+ ("一體（合一）與分裂","人的痛苦來自「<strong>分裂</strong>」感<br>覺得與他人是分離的個體、為生存互相算計；<br>真相是「<strong>我們是一個整體</strong>」，要互助互愛。<br>一體帶來歸屬感與安全感，所有靈性影片／書的共同目標都是「<strong>由分裂走向合一</strong>」。"),
+ ("階梯式書單與課程","<strong style='color:var(--ink)'>學習地圖：阿納絲塔夏 → 耶穌：我的自傳 → 告別娑婆 → 奇蹟課程</strong><br>教導「<strong>上主是你可信賴的力量，不要只靠自己</strong>」。<br><span style='font-size:.88em;color:var(--ink-faint)'>——引用自《奇蹟課程》原文（第 47,50,88,110,132,182,268 等）</span>"),
+ ("寬恕","「<strong>奇蹟課程專教寬恕，用寬恕化解所有問題，連生老病死都能治。</strong>」<br>真寬恕不是為改善關係，而是化解潛意識的罪咎。<br>寬恕三要素：記得你在作夢、寬恕投射出的形象與自己、信賴聖靈。"),
+ ("上主／耶穌（源自耶穌自傳，非新／舊約聖經）","「<strong>上帝</strong>」即「<strong>合一</strong>」，是一股無條件的愛的意識；<br>「<strong>耶穌</strong>」是平易近人的覺醒者，教人如何愛自己也愛別人。<span class='gap'></span>天國就在你心裡，物質世界是心靈分裂的夢境。"),
+ ("對死亡的觀點","死亡不是滅亡，而是朝向更多的擴展，物質世界反而比死亡更像死亡。 <span style='font-size:.88em;color:var(--ink-faint)'>——巴夏</span>"),
+ ("意識轉化四階段","從小我意識轉向心靈意識：①小我不再讓人滿足（內在空虛）→ ②不帶評判、全然接納自己（療癒內在傷口）→ ③找到內在平靜、放開控制、努力「<strong>不做</strong>」→ ④向聖靈敞開、連結神性。"),
+ ("回歸自然","個人實踐：搬到鄉下種田養雞鴨，走路超過 30 分鐘「<strong>會很像冥想</strong>」，人類世界「<strong>一點也不自然</strong>」「<strong>你沒病，是這社會運作方式讓人不舒服</strong>」「<strong>做自己喜歡的工作就會好</strong>」。"),
 ]
 QUOTES = [
  "你內那微細的勸勉之音，那輕柔的低語，在你開始思考它之前，真的就是上主天音的一部分……當你聽到它時，跟隨它。",
- "想做啥是第一個聲音，那是天音；如果跟「可是」是自我分析，專門破裂天音。",
+ "想做啥是第一個聲音，那是天音；如果跟「<strong>可是</strong>」是自我分析，專門破裂天音。",
  "放掉舊的才會看到新的。",
  "做自己就會帶來顯化，內在那感覺就是顯化方針。",
  "我給出去的會回來，讓它自然發展。",
@@ -333,18 +343,13 @@ QUOTES = [
 ]
 
 def build_muxi():
-    teach = "".join(f'<div class="teaching"><span class="t-no">{i+1:02d}</span><h3>{html.escape(t)}</h3><p>{html.escape(d)}</p></div>' for i,(t,d) in enumerate(TEACHINGS))
-    quotes = "".join(f'<div class="quote">{html.escape(q)}</div>' for q in QUOTES)
+    teach = "".join(f'<div class="teaching"><span class="t-no">{i+1:02d}</span><h3>{html.escape(t)}</h3><p>{d}</p></div>' for i,(t,d) in enumerate(TEACHINGS))
+    quotes = "".join(f'<div class="quote">{q}</div>' for q in QUOTES)
     body = f"""<div class="read">
 <div class="section-head"><div class="eyebrow">Section III</div>
 <h1>木喜專區</h1>
 <p>吳木喜身心靈教導精華：十一項核心理念與十句金句。</p>
 <hr class="divider"></div>
-
-<div class="intro-block">
-<p>木喜的引導風格為長期陪伴式，常在學生人生轉折時出現。以下將其核心教導歸納為十一個主題。</p>
-</div>
-
 {teach}
 
 <div class="section-head" style="padding-top:3.5rem"><div class="eyebrow">Quotations</div><h2 style="font-size:2rem;font-weight:900">常引用的金句</h2><hr class="divider"></div>
