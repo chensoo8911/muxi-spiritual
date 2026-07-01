@@ -268,7 +268,7 @@ article.reading p.sec-title{ font-weight:700; color:#A6562C; font-size:1.4em; ma
   padding:2.6rem 1rem 3.5rem; text-align:center; color:var(--ink-faint);
 }
 .foot .f-title{ font-weight:700; color:var(--ink-soft); font-size:1.1rem; }
-.foot p{ margin:.5rem auto; max-width:30em; font-size:.92rem; line-height:1.8; }
+.foot p{ margin:.5rem auto; max-width:46em; font-size:.92rem; line-height:1.8; }
 
 /* ---------- RWD：行動裝置放大字級、單欄 ---------- */
 @media (max-width:900px){
@@ -323,3 +323,6 @@ article.reading p.sec-title{ font-weight:700; color:#A6562C; font-size:1.4em; ma
   .crumb-full li{ display:none; }
   .crumb-full li:nth-last-child(-n+2){ display:flex; }
 }
+
+/* footer 免責聲明：小字、更淡 */
+.foot-disclaimer{ display:inline-block; margin-top:.4em; font-size:.8em; opacity:.75; line-height:1.7; }
