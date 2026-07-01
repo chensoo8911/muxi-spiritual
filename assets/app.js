@@ -99,3 +99,16 @@ document.addEventListener('click', function(e){
   // 離開頁面時停止
   window.addEventListener('beforeunload', () => synth.cancel());
 })();
+
+/* ---------- 3. 手機漢堡選單 ---------- */
+(function(){
+  const nav = document.querySelector('.nav');
+  const toggle = nav && nav.querySelector('.nav-toggle');
+  if(!toggle) return;
+  toggle.addEventListener('click', function(){
+    const open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  // 點任一連結後自動收合
+  nav.querySelectorAll('.links a').forEach(a => a.addEventListener('click', () => nav.classList.remove('open')));
+})();

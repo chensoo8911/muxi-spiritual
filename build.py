@@ -26,12 +26,42 @@ def nav(depth):
     a = "../" * depth
     return f"""<header class="nav">
   <a class="brand" href="{a}index.html">木喜<small>身心靈</small></a>
+  <button class="nav-toggle" aria-label="開啟選單" aria-expanded="false"><span></span><span></span><span></span></button>
   <nav class="links">
     <a href="{a}書籍/index.html">推薦書單</a>
     <a href="{a}影片/index.html">靈性影片</a>
     <a href="{a}木喜專區/index.html">木喜專區</a>
   </nav>
 </header>"""
+
+_CRUMB_BOOKNAME = {"耶穌-我的自傳": "耶穌：我的自傳"}
+_CRUMB_ZONE = {"書籍": "推薦書單", "影片": "靈性影片", "木喜專區": "木喜專區"}
+_CRUMB_WIDE = {"書籍/index.html", "影片/index.html"}  # 用 .wrap(1080) 寬容器的頁面，麵包屑同寬對齊卡片
+def crumb(path, title):
+    """依頁面路徑產生麵包屑：桌面完整路徑＋手機上一頁按鈕（回上一層）。首頁不加。"""
+    parts = path.split("/")
+    cur = title.split(" · ")[0].strip()
+    up = "../" * (len(parts) - 1)
+    if len(parts) == 1:
+        return ""
+    if len(parts) == 2 and parts[1] == "index.html":          # 區首頁
+        zone = _CRUMB_ZONE.get(parts[0], parts[0])
+        items = [("首頁", up + "index.html"), (zone, None)]; back = up + "index.html"
+    elif len(parts) == 2:                                       # 書籍/slug.html 導讀頁
+        items = [("首頁", up + "index.html"), ("推薦書單", "index.html"), (cur, None)]; back = "index.html"
+    elif len(parts) == 3 and parts[2] == "index.html":         # 書目錄
+        items = [("首頁", up + "index.html"), ("推薦書單", "../index.html"), (cur, None)]; back = "../index.html"
+    elif len(parts) == 3:                                       # 章節頁
+        bname = _CRUMB_BOOKNAME.get(parts[1], parts[1])
+        items = [("首頁", up + "index.html"), ("推薦書單", "../index.html"),
+                 (bname, "index.html"), (cur, None)]; back = "index.html"
+    else:
+        return ""
+    lis = "".join(f'<li><a href="{h}">{l}</a></li>' if h else f'<li aria-current="page">{l}</li>'
+                  for l, h in items)
+    cls = "crumb crumb-wide" if path in _CRUMB_WIDE else "crumb"
+    return (f'<nav class="{cls}" aria-label="breadcrumb"><a class="crumb-back" href="{back}">‹ 上一頁</a>'
+            f'<ol class="crumb-full">{lis}</ol></nav>\n')
 
 def foot(depth):
     return """<footer class="foot">
@@ -44,8 +74,12 @@ def foot(depth):
 def page(path, title, depth, body, desc=""):
     full = os.path.join(ROOT, path)
     os.makedirs(os.path.dirname(full), exist_ok=True)
+    parts = path.split("/")
+    # 章節頁的麵包屑放進 reader-top 工具列（跟著 sticky 顯示），外層不再注入
+    is_chapter = len(parts) == 3 and parts[2] != "index.html"
+    cr = "" if is_chapter else crumb(path, title)
     with open(full, "w", encoding="utf-8") as f:
-        f.write(head(title, depth, desc) + body + foot(depth))
+        f.write(head(title, depth, desc) + cr + body + foot(depth))
     print("✓", path)
 
 def lite_yt(vid, title, desc):
@@ -63,7 +97,7 @@ def build_home():
   <div class="eyebrow">A Spiritual Archive</div>
   <h1>木喜身心靈</h1>
   <p>這裡彙整木喜多年來推薦、朗讀與口傳的身心靈資源與教導。</p>
-  <span class="seal">聆聽內在那微細的低語 ── 天音</span>
+  <span class="seal">聆聽內在那微細的低語</span>
 </section>
 
 <section class="wrap">
@@ -150,7 +184,7 @@ def build_book_list():
     body = f"""<div class="wrap">
 <div class="section-head"><div class="eyebrow">Section I</div>
 <h1>推薦書單</h1>
-<p>木喜推薦與朗讀的身心靈書籍。可閱讀全文者附「一鍵朗讀」，並收錄相關有聲書。</p>
+<p>推薦學習地圖：阿納絲塔夏 → 耶穌：我的自傳 → 告別娑婆 → 奇蹟課程</p>
 <hr class="divider"></div>
 <div class="books">{''.join(cards)}</div>
 </div>"""
@@ -201,13 +235,12 @@ def build_reader(b):
     # 目錄頁
     toc = []
     for i, c in enumerate(chs):
-        no = "序" if i==0 else str(i)
+        no = "0" if i==0 else str(i)
         toc.append(f'<li><a href="{c["slug"]}.html"><span class="n">{no}</span><span>{html.escape(c["title"])}</span></a></li>')
     body = f"""<div class="read">
 <div class="section-head"><div class="eyebrow">{html.escape(b['author'])}</div>
 <h1>{html.escape(name)}</h1>
 <p>{html.escape(b.get('subtitle', b['blurb']))}</p><hr class="divider"></div>
-<p style="text-align:center;color:var(--ink-faint)">點開任一章，頁面置頂可「一鍵朗讀」全章。</p>
 <ul class="toc">{''.join(toc)}</ul>
 {aud}
 </div>"""
@@ -228,15 +261,13 @@ def build_reader(b):
       <audio controls preload="none" src="../../audio/{slug}/{la}"></audio>
     </div>"""
         body = f"""<div class="reader-top">
-  <div class="read">
-    <span class="book-label">{html.escape(name)}</span>
+  <div class="read reader-bar">
+    {crumb(f"書籍/{slug}/{c['slug']}.html", f"{html.escape(c['title'])} · {name}")}
     {local_player}
     <div class="player">
       <button class="btn-audio" id="btn-read"><span class="ico"></span><span class="txt">▶ 朗讀本章</span></button>
       <button class="btn-ghost" id="btn-stop" style="display:none">停止</button>
-      <a class="btn-ghost" href="index.html">目錄</a>
     </div>
-    <div class="audio-hint">朗讀使用裝置內建的自然中文語音；手機建議用 Chrome 以獲得最自然的聲音。</div>
   </div>
 </div>
 <div class="read">
@@ -368,6 +399,91 @@ def build_muxi():
 </div>"""
     page("木喜專區/index.html", "木喜專區 · 木喜身心靈", 1, body)
 
+# ============================================================ 耶穌序精修
+def patch_jesus_preface():
+    """耶穌序專屬：抽出五個小節標題（引言/譯者序/作者序/導言/詞彙解析）＋跳轉按鈕、隱藏「序」大字。
+    對 build_reader 產生的原始序頁做字串替換（因源檔為 OCR，小節標題黏在段落中）。"""
+    f = os.path.join(ROOT, "書籍", "耶穌-我的自傳", "00_序.html")
+    if not os.path.exists(f):
+        print("  ⚠ 找不到耶穌序頁，跳過精修"); return
+    s = open(f, encoding="utf-8").read()
+    reps = [
+      ('  <span class="chap-no">序</span>\n  <h1>序</h1>',
+       '  <span class="chap-no" style="display:none">序</span>\n  <h1 style="display:none">序</h1>'),
+      ('  <p>引 言誠心獻給每一位知曉「耶穌故事」有著更多內容的人；特別是曾因基督之名、承受無謂痛苦者。</p>\n'
+       '<p>我獻上此書，願能協助治癒你可能受過的任何形式傷害；並引導你走進更喜悅、更富創造力的人生。</p>',
+       '  <nav class="sec-jump">\n'
+       '    <a href="#sec-translator">譯者序</a>\n'
+       '    <a href="#sec-author">作者序</a>\n'
+       '    <a href="#sec-preface">導言</a>\n'
+       '    <a href="#sec-glossary">詞彙解析</a>\n'
+       '  </nav>\n'
+       '  <p class="sec-title" id="sec-intro">引言</p>\n'
+       '  <p style="line-height:1.9;">誠心獻給每一位知曉「耶穌故事」有著更多內容的人；特別是曾因基督之名、承受無謂痛苦者。</p>\n'
+       '  <p style="line-height:1.9;">我獻上此書，願能協助治癒你可能受過的任何形式傷害；並引導你走進更喜悅、更富創造力的人生。</p>'),
+      ('<p>譯者序從接觸本書到完成翻譯，',
+       '<p class="sec-title" id="sec-translator">譯者序</p>\n<p>從接觸本書到完成翻譯，'),
+      ('魏佳芳、書於奧克蘭 二一七年八月二日作者序大約在兩年前，我的指導靈阿南達',
+       '魏佳芳、書於奧克蘭 二一七年八月二日</p>\n<p class="sec-title" id="sec-author">作者序</p>\n<p>大約在兩年前，我的指導靈阿南達'),
+      ('蒂娜。司帕爾汀“二〇一四年六月二十日呢導 言我回來與世界聯繫了。',
+       '蒂娜。司帕爾汀“二〇一四年六月二十日</p>\n<p class="sec-title" id="sec-preface">導言</p>\n<p>我回來與世界聯繫了。'),
+      ('編者注。) 1詞彙 解析以下的詞彙解析，日後將成為',
+       '編者注。)</p>\n<p class="sec-title" id="sec-glossary">詞彙解析</p>\n<p>以下的詞彙解析，日後將成為'),
+    ]
+    miss = 0
+    for old, new in reps:
+        if old in s: s = s.replace(old, new)
+        else: miss += 1; print("  ⚠ 序頁 patch 未匹配：", old[:18], "…")
+    open(f, "w", encoding="utf-8").write(s)
+    print(f"✓ 耶穌序精修完成（{len(reps)-miss}/{len(reps)} 段套用）")
+
+def patch_farewell_preface():
+    """告別娑婆序：抽「作者序」小節標題、隱藏「序」大字（比照耶穌序）。"""
+    f = os.path.join(ROOT, "書籍", "告別娑婆", "00_序.html")
+    if not os.path.exists(f):
+        print("  ⚠ 找不到告別娑婆序頁，跳過"); return
+    s = open(f, encoding="utf-8").read()
+    reps = [
+      ('  <span class="chap-no">序</span>\n  <h1>序</h1>',
+       '  <span class="chap-no" style="display:none">序</span>\n  <h1 style="display:none">序</h1>'),
+      ('<p>作者序　當我還住在緬因州的鄉下時',
+       '<p class="sec-title" id="sec-author">作者序</p>\n<p>當我還住在緬因州的鄉下時'),
+    ]
+    miss = 0
+    for old, new in reps:
+        if old in s: s = s.replace(old, new)
+        else: miss += 1; print("  ⚠ 告別娑婆序 patch 未匹配：", old[:18], "…")
+    open(f, "w", encoding="utf-8").write(s)
+    print(f"✓ 告別娑婆序精修完成（{len(reps)-miss}/{len(reps)} 段套用）")
+
+def patch_thiaoouba_preface():
+    """海奧華序：抽「前言／序／問與答」三個小節標題＋跳轉按鈕、隱藏大字。"""
+    f = os.path.join(ROOT, "書籍", "海奧華預言", "00_序與前言.html")
+    if not os.path.exists(f):
+        print("  ⚠ 找不到海奧華序頁，跳過"); return
+    s = open(f, encoding="utf-8").read()
+    reps = [
+      ('  <span class="chap-no">序</span>\n  <h1>序與前言</h1>',
+       '  <span class="chap-no" style="display:none">序</span>\n  <h1 style="display:none">序與前言</h1>\n'
+       '  <nav class="sec-jump">\n'
+       '    <a href="#sec-foreword">前言</a>\n'
+       '    <a href="#sec-preface">序</a>\n'
+       '    <a href="#sec-qa">問與答</a>\n'
+       '  </nav>'),
+      ('《聖經》譯文前言地球上有許許多多',
+       '《聖經》譯文</p>\n<p class="sec-title" id="sec-foreword">前言</p>\n<p>地球上有許許多多'),
+      ('<p>序我是遵命寫這本書的',
+       '<p class="sec-title" id="sec-preface">序</p>\n<p>我是遵命寫這本書的'),
+      ('<p>《海奧華預言》問與答問：怎麼發',
+       '<p class="sec-title" id="sec-qa">問與答</p>\n<p>問：怎麼發'),
+    ]
+    miss = 0
+    for old, new in reps:
+        if old in s: s = s.replace(old, new)
+        else: miss += 1; print("  ⚠ 海奧華序 patch 未匹配：", old[:18], "…")
+    open(f, "w", encoding="utf-8").write(s)
+    print(f"✓ 海奧華序精修完成（{len(reps)-miss}/{len(reps)} 段套用）")
+
 # ============================================================ 執行
 if __name__ == "__main__":
     build_home()
@@ -379,4 +495,7 @@ if __name__ == "__main__":
         build_book_intro(b)
     build_videos()
     build_muxi()
+    patch_jesus_preface()
+    patch_farewell_preface()
+    patch_thiaoouba_preface()
     print("\n✅ 網站產生完成 →", ROOT)
