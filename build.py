@@ -152,7 +152,7 @@ BOOKS = [
    "tags":[("full","全文可讀"),("link","導讀")],
    "blurb":"進入《奇蹟課程》前最受歡迎的導讀書。十七場與揚升大師的對話，談寬恕與幻相。",
    "reader":True, "src":"02_告別娑婆", "subtitle":"十七場與揚升大師的對話，談寬恕、幻相與真寬恕。",
-   "local_audio":{"00_序":"告別娑婆_00序.mp3", "01_1_阿頓與白沙的出現":"告別娑婆_01第一章.mp3"},
+   "local_audio":{"00_序":"告別娑婆_00序.mp3", "01_1_阿頓與白莎的出現":"告別娑婆_01第一章.mp3"},
    "why":"階梯書單中「奇蹟課程」的前一站，木喜的寬恕教導大量取自本書。",
    "links":[("英文全文 Internet Archive","https://archive.org/details/disappearanceof00gary")]},
   {"slug":"奇蹟課程", "spine":"gold", "author":"海倫・舒曼 筆錄",
@@ -440,8 +440,7 @@ def patch_farewell_preface():
     reps = [
       ('  <span class="chap-no">序</span>\n  <h1>序</h1>',
        '  <span class="chap-no" style="display:none">序</span>\n  <h1 style="display:none">序</h1>'),
-      ('<p>作者序　當我還住在緬因州的鄉下時',
-       '<p class="sec-title" id="sec-author">作者序</p>\n<p>當我還住在緬因州的鄉下時'),
+      ('<p>作者序</p>', '<p class="sec-title" id="sec-author">作者序</p>'),
     ]
     miss = 0
     for old, new in reps:
