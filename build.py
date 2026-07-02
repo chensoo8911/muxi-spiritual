@@ -407,28 +407,22 @@ def patch_jesus_preface():
     if not os.path.exists(f):
         print("  ⚠ 找不到耶穌序頁，跳過精修"); return
     s = open(f, encoding="utf-8").read()
+    # 來源已改為乾淨 docx，小節標題各自獨立成段（<p>引言</p> 等），此處轉為 sec-title＋跳轉列。
+    nav = ('<nav class="sec-jump">\n'
+           '    <a href="#sec-translator">譯者序</a>\n'
+           '    <a href="#sec-author">作者序</a>\n'
+           '    <a href="#sec-preface">導言</a>\n'
+           '    <a href="#sec-glossary">詞彙解析</a>\n'
+           '  </nav>\n'
+           '  <p class="sec-title" id="sec-intro">引言</p>')
     reps = [
       ('  <span class="chap-no">序</span>\n  <h1>序</h1>',
        '  <span class="chap-no" style="display:none">序</span>\n  <h1 style="display:none">序</h1>'),
-      ('  <p>引 言誠心獻給每一位知曉「耶穌故事」有著更多內容的人；特別是曾因基督之名、承受無謂痛苦者。</p>\n'
-       '<p>我獻上此書，願能協助治癒你可能受過的任何形式傷害；並引導你走進更喜悅、更富創造力的人生。</p>',
-       '  <nav class="sec-jump">\n'
-       '    <a href="#sec-translator">譯者序</a>\n'
-       '    <a href="#sec-author">作者序</a>\n'
-       '    <a href="#sec-preface">導言</a>\n'
-       '    <a href="#sec-glossary">詞彙解析</a>\n'
-       '  </nav>\n'
-       '  <p class="sec-title" id="sec-intro">引言</p>\n'
-       '  <p style="line-height:1.9;">誠心獻給每一位知曉「耶穌故事」有著更多內容的人；特別是曾因基督之名、承受無謂痛苦者。</p>\n'
-       '  <p style="line-height:1.9;">我獻上此書，願能協助治癒你可能受過的任何形式傷害；並引導你走進更喜悅、更富創造力的人生。</p>'),
-      ('<p>譯者序從接觸本書到完成翻譯，',
-       '<p class="sec-title" id="sec-translator">譯者序</p>\n<p>從接觸本書到完成翻譯，'),
-      ('魏佳芳、書於奧克蘭 二一七年八月二日作者序大約在兩年前，我的指導靈阿南達',
-       '魏佳芳、書於奧克蘭 二一七年八月二日</p>\n<p class="sec-title" id="sec-author">作者序</p>\n<p>大約在兩年前，我的指導靈阿南達'),
-      ('蒂娜。司帕爾汀“二〇一四年六月二十日呢導 言我回來與世界聯繫了。',
-       '蒂娜。司帕爾汀“二〇一四年六月二十日</p>\n<p class="sec-title" id="sec-preface">導言</p>\n<p>我回來與世界聯繫了。'),
-      ('編者注。) 1詞彙 解析以下的詞彙解析，日後將成為',
-       '編者注。)</p>\n<p class="sec-title" id="sec-glossary">詞彙解析</p>\n<p>以下的詞彙解析，日後將成為'),
+      ('<p>引言</p>', nav),
+      ('<p>譯者序</p>', '<p class="sec-title" id="sec-translator">譯者序</p>'),
+      ('<p>作者序</p>', '<p class="sec-title" id="sec-author">作者序</p>'),
+      ('<p>導言</p>', '<p class="sec-title" id="sec-preface">導言</p>'),
+      ('<p>詞彙解析</p>', '<p class="sec-title" id="sec-glossary">詞彙解析</p>'),
     ]
     miss = 0
     for old, new in reps:
